@@ -20,14 +20,15 @@ def index():
     context = {
         'events': Event.query.all()
     }
-    return render_template('index.html')
+    return render_template('index.html', **context)
 
 
 @main.route('/event/<event_id>', methods=['GET'])
 def event_detail(event_id):
+    event = Event.query.filter_by(id=event_id).one()
     """Show a single event."""
     context = {
-        'events': Event.query.all()
+        'event': Event.query.all()
     }
     return render_template('event_detail.html', **context)
 
@@ -35,21 +36,26 @@ def event_detail(event_id):
 @main.route('/event/<event_id>', methods=['GET', 'POST'])
 def rsvp(event_id):
     """RSVP to an event."""
+    #Get the event from the database
     event = Event.query.filter_by(id=event_id).one()
     is_returning_guest = request.form.get('returning')
     guest_name = request.form.get('guest_name')
 
     if is_returning_guest:
+        # Look up the guest from the database and add the event to their 
+        #events_attending
         guest = Guest.query.filter_by(name=guest_name).one()
         guest.events_attending.append(event)
         db.session.add(guest)
         db.session.commit()
     else:
+        #create a new guest, add the event to their events_attending
+        # then add the guest to the database
         guest_email = request.form.get('email')
         guest_phone = request.form.get('phone')
         new_guest = Guest(name=guest_name, email=guest_email,
                           phone=guest_phone)
-        new_guest.events_attending.append(new_guest)
+        new_guest.events_attending.append(event)
         db.session.add(new_guest)
         db.session.commit()
 
@@ -80,7 +86,7 @@ def create():
         except ValueError:
             print('there was an error: incorrect datetime format')
 
-            return render_template('create.html')
+    return render_template('create.html')
 
 
 @main.route('/guest/<guest_id>')
