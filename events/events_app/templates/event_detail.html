@@ -51,7 +51,7 @@
 
 <h2>Guests Attending:</h2>
 <ul>
-    {%for guest in guests%}
+    {%for guest in event.guests%}
     <li><a href="/guest/{{guest.id}}">{{guest.name}}</a></li>
     
     {%endfor%}

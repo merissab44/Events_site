@@ -28,7 +28,7 @@ def event_detail(event_id):
     event = Event.query.filter_by(id=event_id).one()
     """Show a single event."""
     context = {
-        'event': Event.query.all()
+        'event': event
     }
     return render_template('event_detail.html', **context)
 
